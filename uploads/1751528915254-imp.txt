@@ -1,0 +1,745 @@
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+
+
+const express = require('express');
+const path = require('path');
+const app = express();
+const port = 3000;
+
+
+app.get('/', (req, res) => {
+    res.send("Hello world...");
+});
+
+
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'front/home.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'front/login.html'));
+});
+
+
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'front/signup.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'front/dashboard.html'));
+});
+
+app.get('/doctordashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'front/doctordashboard.html'));
+});
+
+app.get('/patientdashboard',  (req, res) => {
+  res.sendFile(path.join(__dirname, 'front/patientdashboard.html'));
+});
+
+
+app.get('/hospitaldashboard',  (req, res) => {
+  res.sendFile(path.join(__dirname, 'front/hospitaldashboard.html'));
+});
+
+
+app.get('/logout', (req, res) => {
+    res.redirect('/home');
+});
+
+
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+});
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up | MediVault</title>
+  <style>
+    :root {
+      --primary: #5b6dfa;
+      --accent: #36d1dc;
+      --bg: #f6f9fc;
+      --text-dark: #1e1e2f;
+      --text-light: #6b7280;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .signup-box {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .signup-box h2 {
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    input, select {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4a5edf;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .footer-text a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="signup-box">
+    <h2>Create Your MediVault Account</h2>
+    <form action="/signup" method="POST">
+      <input type="text" name="name" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email Address" required />
+      <input type="text" name="phone" placeholder="Phone Number" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <select name="role" required>
+        <option value="">Select Role</option>
+        <option value="patient">Patient</option>
+        <option value="doctor">Doctor</option>
+        <option value="hospital_staff">Hospital</option>
+      </select>
+      <button type="submit">Register</button>
+    </form>
+
+    <div class="footer-text">
+      Already have an account? <a href="/login">Log in here</a>
+    </div>
+  </div>
+
+</body>
+</html>
+
+
+
+
+
+        PATIENT DASHBOARD
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient Dashboard | MediVault</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #36d1dc;
+      --primary-dark: #2bb8c4;
+      --accent: #5b6dfa;
+      --accent-dark: #4a5ae8;
+      --bg: #f5f8fc;
+      --card-bg: #fff;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text-dark);
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      color: white;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      position: relative;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      padding: 0 10px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      color: white;
+    }
+
+    .nav-menu {
+      flex-grow: 1;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-link i {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .nav-link span {
+      margin-left: 12px;
+      font-size: 15px;
+    }
+
+    .logout-link {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-top: auto;
+      margin-bottom: 10px;
+    }
+
+    .logout-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .logout-link i {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .logout-link span {
+      margin-left: 12px;
+      font-size: 15px;
+    }
+
+    /* Main Content Styles */
+    .main {
+      flex-grow: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .main-header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .date-display {
+      background-color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+    }
+
+    .card h3 {
+      margin: 0 0 15px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .card h3 i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .card p {
+      color: var(--text-light);
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .card .trend {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .card .trend.up {
+      color: var(--success);
+    }
+
+    .card .trend.down {
+      color: var(--danger);
+    }
+
+    .card .trend i {
+      margin-right: 5px;
+    }
+
+    /* Recent Activity Section */
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .activity-list {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      padding: 20px;
+    }
+
+    .activity-item {
+      display: flex;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: rgba(54, 209, 220, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      color: var(--primary);
+      font-size: 16px;
+    }
+
+    .activity-content {
+      flex-grow: 1;
+    }
+
+    .activity-title {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .activity-time {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .activity-action {
+      color: var(--primary);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 992px) {
+      .sidebar {
+        position: fixed;
+        left: calc(-1 * var(--sidebar-width));
+        height: 100vh;
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        padding: 20px;
+      }
+
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Toggle Button for Mobile */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+    }
+
+    @media (max-width: 992px) {
+      .menu-toggle {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-lock logo-icon"></i>
+      <h2>MediVault</h2>
+    </div>
+
+    <div class="nav-menu">
+      <a href="#" class="nav-link active">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-file-medical"></i>
+        <span>My Reports</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-user-md"></i>
+        <span>My Doctors</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Upload Reports</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+
+    <a href="/logout" class="logout-link">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+
+  <div class="main" id="mainContent">
+    <div class="main-header">
+      <h1>Welcome back!</h1>
+      <div class="date-display" id="currentDate">
+        <!-- Date will be inserted here by JavaScript -->
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3><i class="fas fa-file-medical"></i> Medical Reports</h3>
+        <p>Your personal health records</p>
+        <div class="value">15</div>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i> 2 new this month
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-calendar-check"></i> Appointments</h3>
+        <p>Upcoming doctor visits</p>
+        <div class="value">2</div>
+        <div class="trend down">
+          <i class="fas fa-arrow-down"></i> 1 completed
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-prescription-bottle-alt"></i> Prescriptions</h3>
+        <p>Active medications</p>
+        <div class="value">5</div>
+        <div class="trend">
+          <i class="fas fa-equals"></i> No changes
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <p>Unread messages</p>
+        <div class="value">3</div>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i> 1 new today
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <i class="fas fa-history"></i> Recent Activity
+    </div>
+
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-file-upload"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">New lab report uploaded</div>
+          <div class="activity-time">Today, 10:45 AM</div>
+        </div>
+        <div class="activity-action">View</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">Dr. Smith reviewed your report</div>
+          <div class="activity-time">Yesterday, 3:20 PM</div>
+        </div>
+        <div class="activity-action">Details</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-pills"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">New prescription added</div>
+          <div class="activity-time">June 23, 2025</div>
+        </div>
+        <div class="activity-action">View</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon">
+          <i class="fas fa-calendar-plus"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">Appointment scheduled</div>
+          <div class="activity-time">June 22, 2025</div>
+        </div>
+        <div class="activity-action">Details</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle sidebar on mobile
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      mainContent.classList.toggle('sidebar-active');
+    });
+
+    // Add active class to clicked nav link
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        navLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Update date display with current date
+    const updateCurrentDate = () => {
+      const dateElement = document.getElementById('currentDate');
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const now = new Date();
+      
+      dateElement.innerHTML = `
+        <i class="far fa-calendar-alt"></i> ${now.toLocaleDateString('en-US', options)}
+      `;
+    };
+
+    // Initialize and update every minute to keep time current
+    updateCurrentDate();
+    setInterval(updateCurrentDate, 60000);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

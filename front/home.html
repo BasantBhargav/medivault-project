@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediVault | Your Health Records, Anywhere</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #5b6dfa;
+      --accent: #36d1dc;
+      --text-dark: #1e1e2f;
+      --text-light: #6b7280;
+      --bg: #f9fbff;
+      --card-bg: #ffffff;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+    nav a:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 100px 20px 80px;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png'), linear-gradient(to right, #f6f9ff, #e8f0fc);
+      background-size: cover;
+      position: relative;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 10%;
+      right: 5%;
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 160px;
+      color: #dde6fb;
+      content: "\f0f1"; /* stethoscope icon */
+      opacity: 0.15;
+      z-index: 0;
+    }
+    .hero h2 {
+      font-size: 40px;
+      margin-bottom: 20px;
+      color: var(--primary);
+      z-index: 1;
+      line-height: 1.2;
+    }
+    .hero p {
+      max-width: 700px;
+      font-size: 18px;
+      color: var(--text-light);
+      margin-bottom: 30px;
+      z-index: 1;
+    }
+    .buttons {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 1;
+    }
+    .button {
+      background-color: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(91, 109, 250, 0.3);
+    }
+    .button.secondary {
+      background-color: var(--accent);
+    }
+    .button.secondary:hover {
+      box-shadow: 0 5px 15px rgba(54, 209, 220, 0.3);
+    }
+    .section {
+      padding: 80px 40px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 32px;
+      color: var(--primary);
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .feature-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    .feature-icon {
+      font-size: 40px;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .feature-title {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+    .feature-desc {
+      color: var(--text-light);
+    }
+    .how-it-works {
+      background-color: #f1f5fe;
+    }
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+    .step {
+      flex: 1;
+      min-width: 250px;
+      max-width: 350px;
+      text-align: center;
+      padding: 30px;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .cta {
+      text-align: center;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      color: white;
+      padding: 80px 20px;
+    }
+    .cta h2 {
+      margin-bottom: 20px;
+    }
+    .cta p {
+      max-width: 700px;
+      margin: 0 auto 30px;
+      opacity: 0.9;
+    }
+    footer {
+      background-color: #1e1e2f;
+      color: white;
+      padding: 50px 20px 20px;
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-column h3 {
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .footer-column ul {
+      list-style: none;
+    }
+    .footer-column ul li {
+      margin-bottom: 10px;
+    }
+    .footer-column ul li a {
+      color: #a1a1aa;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .footer-column ul li a:hover {
+      color: white;
+    }
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .social-links a {
+      color: white;
+      font-size: 20px;
+    }
+    .copyright {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a1a1aa;
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+      }
+      nav {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      nav a {
+        margin: 0;
+      }
+      .hero h2 {
+        font-size: 32px;
+      }
+      .section {
+        padding: 60px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i class="fa-solid fa-heart-pulse"></i> MediVault</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Your Complete Digital Health Companion</h2>
+    <p>MediVault revolutionizes healthcare by providing a secure, unified platform for storing, sharing, and accessing medical records — anytime, anywhere. Say goodbye to paper files and hello to seamless healthcare management.</p>
+    
+    <div class="buttons">
+      <a href="/login" class="button"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+      <a href="/signup" class="button secondary"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="section-title">Why Choose MediVault?</h2>
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="feature-title">Military-Grade Security</h3>
+          <p class="feature-desc">Your health data is encrypted with AES-256 encryption and stored securely in HIPAA-compliant servers, accessible only to authorized personnel.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-hospital-user"></i>
+          </div>
+          <h3 class="feature-title">Hospital Integration</h3>
+          <p class="feature-desc">Automatic report uploads from partner hospitals and labs. No more collecting physical reports or scanning documents.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-mobile-screen"></i>
+          </div>
+          <h3 class="feature-title">Anywhere Access</h3>
+          <p class="feature-desc">Access your complete medical history from any device. Our responsive platform works perfectly on mobile, tablet, and desktop.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+          <h3 class="feature-title">Doctor Collaboration</h3>
+          <p class="feature-desc">Securely share records with healthcare providers. Get second opinions without the hassle of physical transfers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <h3 class="feature-title">Smart Notifications</h3>
+          <p class="feature-desc">Get alerts for new reports, medication reminders, and upcoming appointments. Never miss important health updates.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <h3 class="feature-title">Health Analytics</h3>
+          <p class="feature-desc">Visualize your health trends over time with our intuitive dashboards. Track progress and identify patterns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="section how-it-works">
+    <div class="container">
+      <h2 class="section-title">How MediVault Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Sign Up</h3>
+          <p>Create your secure account in minutes. Verification ensures only you have access to your medical data.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Connect Hospitals</h3>
+          <p>Link your account with partner hospitals and labs for automatic report uploads to your digital vault.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Upload Existing Records</h3>
+          <p>Scan or upload your historical medical records to create a complete digital health profile.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>Access & Share Securely</h3>
+          <p>View your records anytime and share with doctors as needed with granular permission controls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to Transform Your Healthcare Experience?</h2>
+    <p>Join thousands of patients and doctors who trust MediVault with their medical records. Secure, convenient, and designed for modern healthcare.</p>
+    <a href="/signup" class="button"><i class="fa-solid fa-user-plus"></i> Get Started Now</a>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-column">
+        <h3>MediVault</h3>
+        <p>Your complete digital health companion, making healthcare accessible and secure for everyone.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>For Patients</h3>
+        <ul>
+          <li><a href="/signup">Create Account</a></li>
+          <li><a href="/login">Patient Login</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>For Healthcare Providers</h3>
+        <ul>
+          <li><a href="#">Hospital Integration</a></li>
+          <li><a href="/login">Doctor Login</a></li>
+          <li><a href="#">API Documentation</a></li>
+          <li><a href="#">Partner With Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2025 MediVault Technologies. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+    </div>
+  </footer>
+</body>
+</html>

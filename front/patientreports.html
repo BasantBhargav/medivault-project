@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Patient Reports | MediVault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4a6cf7;
+      --accent: #36d1dc;
+      --bg: #f8fafd;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+      --card-bg: #fff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 25px;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+    }
+
+    .back-link:hover {
+      border-color: var(--primary);
+    }
+
+    .patient-info {
+      background: var(--card-bg);
+      padding: 24px;
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .patient-info h2 {
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+    }
+
+    .patient-info p {
+      margin: 4px 0;
+      color: var(--text-medium);
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .report-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .report-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .report-card h3 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .report-card p {
+      margin: 6px 0;
+      color: var(--text-medium);
+    }
+
+    .report-actions {
+      margin-top: 14px;
+    }
+
+    .report-actions a {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-right: 12px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .view-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .view-btn:hover {
+      background: #3d56df;
+      transform: translateY(-1px);
+    }
+
+    .download-btn {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .download-btn:hover {
+      background: #0e9f6e;
+      transform: translateY(-1px);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/doctordashboard" class="back-link">&larr; Back to Dashboard</a>
+    <h1>Patient Report Details</h1>
+
+    <div class="patient-info" id="patientDetails"></div>
+
+    <div class="controls">
+      <select id="sortSelect" onchange="renderReports()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="az">Report Type A-Z</option>
+        <option value="za">Report Type Z-A</option>
+      </select>
+    </div>
+
+    <div id="reportContainer">Loading reports...</div>
+  </div>
+
+  <script>
+    const patientId = new URLSearchParams(window.location.search).get('patientId');
+    let reportData = [];
+
+    async function fetchReports() {
+      try {
+        const res = await fetch(`/api/reports/${patientId}`);
+        const data = await res.json();
+        reportData = data;
+
+        if (!data.length) {
+          document.getElementById('reportContainer').innerHTML =
+            '<div class="no-data">No reports found for patient ID: <strong>' + patientId + '</strong></div>';
+          return;
+        }
+
+        const details = `
+          <h2>Patient ID: ${patientId}</h2>
+          <p><strong>Total Reports:</strong> ${data.length}</p>
+          <p><strong>Last Report Uploaded:</strong> ${new Date(data[0].uploadedAt).toLocaleString()}</p>
+        `;
+        document.getElementById('patientDetails').innerHTML = details;
+
+        renderReports();
+      } catch (err) {
+        console.error('Error loading reports:', err);
+        document.getElementById('reportContainer').innerHTML =
+          '<div class="no-data">An error occurred while fetching reports.</div>';
+      }
+    }
+
+    function renderReports() {
+      const container = document.getElementById('reportContainer');
+      const sortValue = document.getElementById('sortSelect').value;
+
+      let sorted = [...reportData];
+      if (sortValue === 'newest') {
+        sorted.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+      } else if (sortValue === 'oldest') {
+        sorted.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt));
+      } else if (sortValue === 'az') {
+        sorted.sort((a, b) => a.reportType.localeCompare(b.reportType));
+      } else if (sortValue === 'za') {
+        sorted.sort((a, b) => b.reportType.localeCompare(a.reportType));
+      }
+
+      container.innerHTML = sorted.map(r => `
+        <div class="report-card">
+          <h3>${r.reportType}</h3>
+          <p><strong>File:</strong> ${r.filename}</p>
+          <p><strong>Uploaded:</strong> ${new Date(r.uploadedAt).toLocaleString()}</p>
+          <div class="report-actions">
+            <a href="/${r.filePath}" class="view-btn" target="_blank">🔍 View</a>
+            <a href="/${r.filePath}" class="download-btn" download>⬇ Download</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    fetchReports();
+  </script>
+</body>
+</html>

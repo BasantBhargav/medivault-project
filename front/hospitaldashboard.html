@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hospital Dashboard | MediVault</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #5b6dfa;
+      --primary-light: #6a85f9;
+      --accent: #36d1dc;
+      --bg: #f5f8fc;
+      --card-bg: #fff;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+      --text-light: #6b7280;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-dark);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Enhanced with Patient Dashboard Theme */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      color: white;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 0 10px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      margin-top: 15px;
+      letter-spacing: 1px;
+    }
+
+    .nav-menu {
+      flex-grow: 1;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      margin-bottom: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: white;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-link.active::before {
+      transform: scaleY(1);
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.1rem;
+      margin-right: 12px;
+      text-align: center;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .user-profile:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background-color: white;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 12px;
+      font-size: 1rem;
+    }
+
+    .user-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 3px;
+    }
+
+    .user-info p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .logout-btn i {
+      margin-right: 8px;
+    }
+
+    /* Main Content - Matching Patient Dashboard */
+    .main {
+      flex-grow: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+      background-color: var(--bg);
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .main-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .date-display {
+      background-color: var(--card-bg);
+      padding: 10px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      font-size: 0.95rem;
+      color: var(--text-medium);
+      display: flex;
+      align-items: center;
+    }
+
+    .date-display i {
+      margin-right: 8px;
+      color: var(--primary);
+    }
+
+    /* Cards - Enhanced Design */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+    }
+
+    .card h3 {
+      margin: 0 0 15px;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .card h3 i {
+      margin-right: 10px;
+    }
+
+    .card p {
+      color: var(--text-medium);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .card .stat {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 15px 0;
+    }
+
+    .card .trend {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .trend.up {
+      color: var(--success);
+    }
+
+    .trend.down {
+      color: var(--danger);
+    }
+
+    .trend i {
+      margin-right: 5px;
+    }
+
+    /* Upload Form - Beautiful Styling */
+    .upload-card {
+      grid-column: span 2;
+      background-color: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .upload-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+    }
+
+    .upload-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--text-medium);
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(91, 109, 250, 0.2);
+    }
+
+    .file-upload {
+      position: relative;
+      grid-column: span 2;
+    }
+
+    .file-upload input {
+      width: 100%;
+      padding: 40px 20px;
+      border: 2px dashed #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-upload input:hover {
+      border-color: var(--primary);
+      background: rgba(91, 109, 250, 0.05);
+    }
+
+    .file-upload .upload-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .file-upload .upload-text {
+      color: var(--text-medium);
+      margin-bottom: 5px;
+    }
+
+    .file-upload .upload-hint {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .submit-btn {
+      grid-column: span 2;
+      padding: 14px;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(to right, var(--primary), #5a75f8);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(91, 109, 250, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .cards {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .upload-card {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        padding: 20px;
+      }
+      
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .upload-card {
+        grid-column: span 1;
+      }
+      
+      .upload-form {
+        grid-template-columns: 1fr;
+      }
+      
+      .submit-btn {
+        grid-column: span 1;
+      }
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    @media (max-width: 992px) {
+      .menu-toggle {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar with Enhanced Design -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>MediVault</h2>
+    </div>
+
+    <div class="nav-menu">
+      <a href="#" class="nav-link">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-link active">
+        <i class="fas fa-calendar-check"></i>
+        <span>Appointments</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-procedures"></i>
+        <span>Patients</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-file-medical"></i>
+        <span>Reports</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">DB</div>
+        <div class="user-info">
+          <h4>Dr. Basant</h4>
+          <p>Cardiologist</p>
+        </div>
+      </div>
+
+      <button class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="main-header">
+      <button class="menu-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1>Hospital Administration</h1>
+      <div class="date-display">
+        <i class="far fa-calendar-alt"></i>
+        <span id="current-date">Loading date...</span>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3><i class="fas fa-user-injured"></i> Total Patients</h3>
+        <p>Registered in system</p>
+        <div class="stat">1,328</div>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i>
+          <span>8.5% from last month</span>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3><i class="fas fa-bed"></i> Current Admissions</h3>
+        <p>Patients in care</p>
+        <div class="stat">87</div>
+        <div class="trend neutral">
+          <i class="fas fa-equals"></i>
+          <span>Same as yesterday</span>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3><i class="fas fa-user-md"></i> Staff On Duty</h3>
+        <p>Currently working</p>
+        <div class="stat">64</div>
+        <div class="trend">
+          <i class="fas fa-info-circle"></i>
+          <span>12 doctors, 52 nurses</span>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <p>Require attention</p>
+        <div class="stat">5</div>
+        <div class="trend up">
+          <i class="fas fa-arrow-up"></i>
+          <span>2 new today</span>
+        </div>
+      </div>
+
+      <div class="upload-card">
+        <h3><i class="fas fa-cloud-upload-alt"></i> Upload Patient Report</h3>
+        <form class="upload-form" action="/upload-report" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="patientId">Patient ID</label>
+            <input type="text" name="patientId" id="patientId" required placeholder="Enter Patient Unique ID">
+          </div>
+          
+          <div class="form-group">
+            <label for="reportType">Report Type</label>
+            <select name="reportType" id="reportType" required>
+              <option value="">Select Report Type</option>
+              <option value="lab">Lab Test</option>
+              <option value="imaging">Imaging</option>
+              <option value="prescription">Prescription</option>
+              <option value="discharge">Discharge Summary</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="file-upload">
+            <label>
+              <input type="file" name="report" id="report" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+              <div class="upload-icon">
+                <i class="fas fa-file-upload"></i>
+              </div>
+              <div class="upload-text">Drag & drop files here or click to browse</div>
+              <div class="upload-hint">Supports PDF, JPG, PNG, DOC (Max 10MB)</div>
+            </label>
+          </div>
+          
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-upload"></i> Upload Report
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dynamic date display
+    function updateCurrentDate() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      };
+      document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    updateCurrentDate();
+    setInterval(updateCurrentDate, 60000);
+
+    // Toggle sidebar on mobile
+    document.querySelector('.menu-toggle').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('active');
+    });
+
+    // Logout button functionality
+    document.querySelector('.logout-btn').addEventListener('click', function() {
+      // In a real app, this would redirect to logout endpoint
+      window.location.href = '/logout';
+    });
+
+    // File upload preview
+    document.getElementById('report').addEventListener('change', function(e) {
+      const fileName = e.target.files[0]?.name || 'No file selected';
+      document.querySelector('.upload-text').textContent = fileName;
+    });
+
+    // Card hover animations
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        document.querySelectorAll('.card').forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, index * 100);
+        });
+      }, 300);
+    });
+  </script>
+</body>
+</html>
