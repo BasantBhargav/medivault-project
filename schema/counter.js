@@ -7,3 +7,6 @@ const counterSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Counter', counterSchema);
+
+
+

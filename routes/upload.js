@@ -75,8 +75,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const nodemailer = require('nodemailer'); // ✅ Added nodemailer
 const Report = require('../schema/report');
-const User = require('../schema/user'); // ✅ Needed for validation
+const User = require('../schema/user'); // ✅ For patient details
 
 const router = express.Router();
 
@@ -97,22 +98,61 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /**
- * ✅ Fetch reports by patient ID
- * Used by doctors to search patient reports
+ * ✅ Send email notification to patient
  */
-router.get('/api/reports/:patientId', async (req, res) => {
+async function sendReportMail(patient, report) {
   try {
-    const reports = await Report.find({ patientId: req.params.patientId }).sort({ uploadedAt: -1 });
-    res.json(reports);
-  } catch (error) {
-    console.error('❌ Error fetching reports:', error);
-    res.status(500).json({ message: 'Error fetching patient reports' });
+    // ✅ Create transporter with hardcoded credentials
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'bhargavbasant123@gmail.com', // 👉 Your Gmail here
+        pass: 'onok cstd xctp pguj'         // 👉 Your App Password here
+      }
+    });
+
+    // ✅ Mail content with Login Button
+    let mailOptions = {
+      from: '"MediVault" <bhargavbasant123@gmail.com>',
+      to: patient.email,
+      subject: `MediVault: New Report Uploaded`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 10px; color: #333;">
+          <h2>Hello ${patient.name},</h2>
+          <p>A new medical report has been uploaded to your MediVault account. Below are the details:</p>
+          <ul>
+            <li><strong>Patient ID:</strong> ${patient._id}</li>
+            <li><strong>Patient Name:</strong> ${patient.name}</li>
+            <li><strong>Report Type:</strong> ${report.reportType}</li>
+            <li><strong>Upload Date:</strong> ${new Date(report.uploadedAt).toLocaleString()}</li>
+            <li><strong>Report File:</strong> ${report.filename}</li>
+          </ul>
+          <p>You can login to your account to view and download the report.</p>
+          <p style="margin-top:20px;">
+            <a href="http://localhost:3000/login" style="
+              background-color:#4CAF50;
+              color:white;
+              padding:10px 20px;
+              text-decoration:none;
+              border-radius:5px;">
+              🔒 Login to MediVault
+            </a>
+          </p>
+          <p style="margin-top:20px;">Thank you,<br/>MediVault Team</p>
+        </div>
+      `
+    };
+
+    // ✅ Send mail
+    let info = await transporter.sendMail(mailOptions);
+    console.log('📧 Mail sent to:', patient.email, '| Message ID:', info.messageId);
+  } catch (err) {
+    console.error('❌ Error sending mail:', err.message);
   }
-});
+}
 
 /**
  * ✅ Upload report endpoint
- * Handles uploads from both hospital and patient sides
  */
 router.post('/upload-report', upload.single('report'), async (req, res) => {
   const { patientId, reportType } = req.body;
@@ -126,11 +166,13 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
     let finalPatientId = patientId;
 
     // ✅ Check if this is a patient uploading their own report
+    let patient;
     if (req.session && req.session.userId && req.session.role === 'patient') {
       finalPatientId = req.session.userId; // Use logged-in patient's ID
+      patient = await User.findOne({ _id: finalPatientId });
     } else {
       // ✅ Hospital uploading: Validate patient ID
-      const patient = await User.findOne({ _id: patientId, role: 'patient' });
+      patient = await User.findOne({ _id: patientId, role: 'patient' });
       if (!patient) {
         console.error(`❌ Invalid patient ID or not a patient: ${patientId}`);
         return res.send(`<script>alert('❌ Invalid Patient ID or User is not a patient'); window.location.href='/hospitaldashboard';</script>`);
@@ -143,17 +185,21 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
       patientId: finalPatientId,
       reportType,
       filename: req.file.filename,
-      filePath: `uploads/${req.file.filename}` // ✅ relative path
+      filePath: `uploads/${req.file.filename}`, // ✅ relative path
+      uploadedAt: new Date()
     });
 
     await report.save();
     console.log(`✅ Report uploaded for patient ${finalPatientId}: ${report.filePath}`);
 
+    // ✅ Send email notification
+    await sendReportMail(patient, report);
+
     // Send appropriate response
     if (req.session && req.session.role === 'patient') {
-      res.send('✅ Report uploaded successfully!'); // Patient upload
+      res.send('✅ Report uploaded successfully!');
     } else {
-      res.send(`<script>alert('✅ Report uploaded successfully'); window.location.href='/hospitaldashboard';</script>`); // Hospital upload
+      res.send(`<script>alert('✅ Report uploaded successfully'); window.location.href='/hospitaldashboard';</script>`);
     }
   } catch (err) {
     console.error('❌ Error saving report to DB:', err.message, err);
@@ -161,49 +207,9 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
   }
 });
 
-/**
- * ✅ Delete report endpoint
- * Allows patients to delete their own reports
- */
-router.delete('/delete-report/:reportId', async (req, res) => {
-  try {
-    const reportId = req.params.reportId;
-
-    // Fetch the report
-    const report = await Report.findById(reportId);
-    if (!report) {
-      console.error(`❌ Report not found: ${reportId}`);
-      return res.status(404).json({ message: 'Report not found' });
-    }
-
-    // Check if the user is allowed to delete this report
-    if (
-      req.session &&
-      req.session.role === 'patient' &&
-      req.session.userId !== report.patientId
-    ) {
-      console.error(`❌ Unauthorized delete attempt by user: ${req.session.userId}`);
-      return res.status(403).json({ message: 'Unauthorized to delete this report' });
-    }
-
-    // Delete the file from the filesystem
-    const filePath = path.join(__dirname, '..', report.filePath);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Delete from database
-    await Report.findByIdAndDelete(reportId);
-    console.log(`🗑️ Report deleted: ${reportId}`);
-
-    res.json({ message: '✅ Report deleted successfully' });
-  } catch (error) {
-    console.error('❌ Error deleting report:', error);
-    res.status(500).json({ message: 'Error deleting report' });
-  }
-});
-
 module.exports = router;
+
+
 
 
 

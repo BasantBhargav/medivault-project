@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MediVault - Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --primary: #5b6dfa;
+      --primary-dark: #4a5edf;
       --accent: #36d1dc;
       --bg: #f6f9fc;
       --text-dark: #1e1e2f;
@@ -15,24 +17,87 @@
       --success: #4CAF50;
       --warning: #FF9800;
       --error: #f44336;
+      --nav-bg: linear-gradient(to right, var(--primary), var(--accent));
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
 
     body {
       background: linear-gradient(135deg, var(--primary), var(--accent));
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      flex-direction: column;
     }
 
+    /* ----------------- HEADER ----------------- */
+    header {
+      background: var(--nav-bg);
+      color: white;
+      padding: 10px 27px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header .logo {
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header .logo i {
+      font-size: 24px;
+    }
+
+    header nav {
+      display: flex;
+      gap: 30px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding: 5px 0;
+      position: relative;
+    }
+
+    header nav a:hover {
+      color: #e0e0e0;
+    }
+
+    header nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: white;
+      bottom: 0;
+      left: 0;
+      transition: width 0.3s ease;
+    }
+
+    header nav a:hover::after {
+      width: 100%;
+    }
+
+    
+
+    /* ----------------- SIGNUP CONTAINER ----------------- */
     .signup-container {
       display: flex;
       width: 100%;
@@ -42,6 +107,7 @@
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+      margin: 90px auto 20px; /* Increased top margin for fixed header */
     }
 
     .welcome-section {
@@ -292,6 +358,7 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
 
     @media (max-width: 900px) {
       .signup-container {
@@ -309,8 +376,25 @@
     }
 
     @media (max-width: 500px) {
+      body {
+        padding-top: 120px; /* More space for stacked header */
+      }
+      
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+      
+      header nav {
+        margin-top: 15px;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
       .signup-container {
         min-height: auto;
+        margin-top: 120px;
       }
       
       .form-section {
@@ -330,6 +414,18 @@
   </style>
 </head>
 <body>
+  <!-- Updated Header -->
+  <header>
+    <div class="logo">
+      <i class="fas fa-heartbeat"></i> MediVault
+    </div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+      <a href="/register">Signup</a>
+    </nav>
+  </header>
+    
   <div class="signup-container">
     <div class="welcome-section">
       <div class="logo">
@@ -643,10 +739,10 @@
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const formData = new FormData(signupForm);
         const data = Object.fromEntries(formData.entries());
-        
+
         try {
           const response = await fetch('/signup', {
             method: 'POST',
@@ -655,9 +751,14 @@
             },
             body: JSON.stringify(data)
           });
-          
+
           if (response.ok) {
-            window.location.href = `/${selectedRole}dashboard`;
+            if (selectedRole === 'patient') {
+              window.location.href = '/patientdashboard';
+            } else {
+              alert('Your signup request has been sent for admin approval. You will be notified once approved.');
+              window.location.href = '/login';
+            }
           } else {
             const error = await response.text();
             alert(error);

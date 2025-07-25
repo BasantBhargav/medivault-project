@@ -1,36 +1,21 @@
 const mongoose = require('mongoose');
 
 const hospitalSchema = new mongoose.Schema({
-  hospital_id: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
+  hospital_id: { type: Number, required: true, unique: true }, // Auto-generated
+  admin_user_id: { type: String, required: true, unique: true }, // Links to User._id
+  name: String,
   location: {
-    address_line: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, default: 'India' },
-    pin_code: { type: String, required: true }
+    address_line: String,
+    city: String,
+    state: String,
+    pin_code: String,
+    country: { type: String, default: 'India' }
   },
   contact: {
-    phone: { type: String },
-    email: { type: String }
+    phone: String,
+    email: String
   },
-  admin_user_id: {
-    type: String,
-    ref: 'User',
-    required: true,
-    unique: true
-  }
-}, {
-  timestamps: true
+  created_at: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Hospital', hospitalSchema);

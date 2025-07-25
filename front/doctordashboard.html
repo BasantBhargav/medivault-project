@@ -29,7 +29,7 @@
       font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--bg);
       display: flex;
-      height: 100vh;
+      min-height: 100vh;
       color: var(--text-dark);
     }
 
@@ -39,11 +39,14 @@
       color: white;
       display: flex;
       flex-direction: column;
-      justify-content: space-between; /* 🆕 Ensures footer stays at bottom */
+      justify-content: space-between;
       padding: 20px;
       transition: transform 0.3s ease;
       height: 100vh;
-      position: relative;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .sidebar-header {
@@ -86,10 +89,12 @@
     .nav-link i {
       width: 20px;
       text-align: center;
+      font-size: 1.1rem;
     }
 
     .nav-link span {
       margin-left: 12px;
+      font-size: 0.95rem;
     }
 
     .sidebar-footer {
@@ -122,12 +127,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       text-decoration: none;
       background-color: rgba(255, 255, 255, 0.1);
       color: white;
       transition: background 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .logout-link i {
+      margin-right: 8px;
     }
 
     .logout-link:hover {
@@ -138,6 +148,8 @@
       flex-grow: 1;
       padding: 25px 30px;
       overflow-y: auto;
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
     }
 
     .main-header {
@@ -156,16 +168,19 @@
 
     .date-display {
       background-color: var(--card-bg);
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 8px;
       font-size: 0.9rem;
       color: var(--text-medium);
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
@@ -180,11 +195,15 @@
       font-size: 1.1rem;
       margin-bottom: 8px;
       color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .card .stat {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: 700;
+      margin: 10px 0;
     }
 
     .card .trend {
@@ -208,62 +227,158 @@
 
     .search-form input {
       flex-grow: 1;
-      padding: 10px 14px;
+      min-width: 200px;
+      padding: 12px 16px;
       border-radius: 8px;
       border: 1px solid #ddd;
       font-size: 0.95rem;
     }
 
     .search-form button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: linear-gradient(to right, var(--primary), var(--primary-light));
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: 500;
       cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
     }
 
     .search-form button:hover {
       opacity: 0.95;
     }
 
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .search-card {
+        grid-column: span 1;
+      }
+    }
+
     @media (max-width: 768px) {
+      :root {
+        --sidebar-width: 260px;
+      }
+      
       .sidebar {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        height: 100%;
-        z-index: 1000;
+        transform: translateX(-100%);
       }
-
+      
       .sidebar.open {
-        transform: translateX(260px);
+        transform: translateX(0);
       }
-
+      
       .main {
-        padding: 20px;
+        margin-left: 0;
+        width: 100%;
+        padding: 20px 15px;
+        padding-top: 70px;
       }
-
+      
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      
+      .overlay.active {
+        display: block;
+      }
+      
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .search-card {
+        grid-column: span 1;
+      }
+      
       .main-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 15px;
       }
-
-      .search-form {
-        flex-direction: column;
-      }
-
-      .search-form button {
+      
+      .date-display {
         width: 100%;
+        justify-content: center;
       }
     }
 
     @media (max-width: 480px) {
       .main-header h1 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
       }
+      
+      .card .stat {
+        font-size: 1.5rem;
+      }
+      
+      .search-form {
+        flex-direction: column;
+      }
+      
+      .search-form button {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .nav-link {
+        padding: 14px 15px;
+      }
+      
+      .user-profile {
+        padding: 12px;
+      }
+    }
 
+    @media (max-width: 360px) {
+      .main {
+        padding: 15px 10px;
+        padding-top: 70px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      .card h3 {
+        font-size: 1rem;
+      }
+      
       .card .stat {
         font-size: 1.3rem;
       }
@@ -272,8 +387,16 @@
 </head>
 <body>
 
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Overlay for mobile menu -->
+  <div class="overlay" id="overlay"></div>
+
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div>
       <div class="sidebar-header">
         <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
@@ -282,7 +405,7 @@
 
       <div class="nav-menu">
         <a href="#" class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a>
-        <a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Appointments</span></a>
+        <a href="/prescription.html" class="nav-link"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
         <a href="#" class="nav-link"><i class="fas fa-user-injured"></i><span>Patients</span></a>
         <a href="#" class="nav-link"><i class="fas fa-file-medical"></i><span>Reports</span></a>
         <a href="#" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a>
@@ -290,7 +413,6 @@
       </div>
     </div>
 
-    <!-- Footer always visible -->
     <div class="sidebar-footer">
       <div class="user-profile">
         <div class="user-avatar">DB</div>
@@ -306,33 +428,33 @@
   <!-- Main Content -->
   <div class="main">
     <div class="main-header">
-      <h1>Welcome, Dr. Basant</h1>
+      <h1>Welcome Back, Dr. Basant</h1>
       <div class="date-display" id="dateDisplay"></div>
     </div>
 
     <div class="cards">
       <div class="card">
-        <h3>Total Patients</h3>
+        <h3><i class="fas fa-users"></i> Total Patients</h3>
         <div class="stat">132</div>
-        <div class="trend">12% from last month</div>
+        <div class="trend"><i class="fas fa-arrow-up text-success"></i> 12% from last month</div>
       </div>
 
       <div class="card">
-        <h3>Upcoming Appointments</h3>
+        <h3><i class="fas fa-calendar-check"></i> Upcoming Appointments</h3>
         <div class="stat">6</div>
-        <div class="trend">2 less than yesterday</div>
+        <div class="trend"><i class="fas fa-arrow-down text-warning"></i> 2 less than yesterday</div>
       </div>
 
       <div class="card">
-        <h3>Reports Uploaded</h3>
+        <h3><i class="fas fa-file-upload"></i> Reports Uploaded</h3>
         <div class="stat">29</div>
-        <div class="trend">8 more than last week</div>
+        <div class="trend"><i class="fas fa-arrow-up text-success"></i> 8 more than last week</div>
       </div>
 
       <div class="card">
-        <h3>Notifications</h3>
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
         <div class="stat">3</div>
-        <div class="trend">2 new today</div>
+        <div class="trend"><i class="fas fa-circle text-primary"></i> 2 new today</div>
       </div>
 
       <div class="search-card">
@@ -348,6 +470,7 @@
   </div>
 
   <script>
+    // Update date display
     function updateDate() {
       const now = new Date();
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -355,6 +478,7 @@
     }
     updateDate();
 
+    // Redirect to patient reports
     function redirectToPatientReports(event) {
       event.preventDefault();
       const patientId = document.getElementById('patientId').value.trim();
@@ -362,6 +486,44 @@
         window.location.href = `/patientreports.html?patientId=${encodeURIComponent(patientId)}`;
       }
     }
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      document.body.classList.toggle('no-scroll');
+    });
+    
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
+    });
+    
+    // Close menu when clicking on nav links (for mobile)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('active');
+          document.body.classList.remove('no-scroll');
+        }
+      });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+      }
+    });
   </script>
 </body>
 </html>

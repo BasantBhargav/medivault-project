@@ -5,101 +5,343 @@
   <title>Manage Patients | MediVault</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
+    :root {
+      --primary: #2a3f54;
+      --secondary: #1abc9c;
+      --danger: #e74c3c;
+      --light: #f5f8fc;
+      --dark: #1a2a3a;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f5f8fc;
+      background: var(--light);
       margin: 0;
+      color: #333;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: var(--primary);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      box-shadow: var(--shadow);
+    }
+    
+    .sidebar-header {
       padding: 20px;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    
+    .sidebar-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: white;
+      display: flex;
+      align-items: center;
+    }
+    
+    .sidebar-header i {
+      margin-right: 10px;
+      color: var(--secondary);
+    }
+    
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 15px 20px;
+      text-decoration: none;
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+    }
+    
+    .sidebar a i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left: 4px solid var(--secondary);
+    }
+    
+    .sidebar a.active {
+      background: rgba(26, 188, 156, 0.2);
+      border-left: 4px solid var(--secondary);
+    }
+    
+    .main {
+      margin-left: 260px;
+      padding: 30px;
+      min-height: 100vh;
+    }
+    
     h1 {
-      color: #2a3f54;
+      color: var(--primary);
       margin-bottom: 20px;
+      font-weight: 600;
     }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      background: var(--secondary);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: background 0.3s;
+    }
+    
+    .back-btn:hover {
+      background: #16a085;
+    }
+    
+    .back-btn i {
+      margin-right: 8px;
+    }
+    
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
     }
+    
     th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
+      padding: 15px;
       text-align: left;
+      border-bottom: 1px solid #f0f0f0;
     }
+    
     th {
-      background: #5b6dfa;
+      background: var(--primary);
       color: white;
+      font-weight: 500;
     }
+    
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    
     .action-btn {
-      display: inline-block;
-      width: 80px;
-      text-align: center;
-      padding: 8px 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
       border-radius: 4px;
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 500;
       color: white;
       text-decoration: none;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s;
+      border: none;
     }
-    .view-btn {
-      background: #1abc9c;
-    }
-    .view-btn:hover {
-      background: #16a085;
-    }
+    
     .delete-btn {
-      background: #e74c3c;
+      background: var(--danger);
     }
+    
     .delete-btn:hover {
       background: #c0392b;
+    }
+    
+    .action-btn i {
+      margin-right: 5px;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+        overflow: hidden;
+      }
+      
+      .sidebar-header h2 span,
+      .sidebar a span {
+        display: none;
+      }
+      
+      .sidebar a {
+        justify-content: center;
+        padding: 15px 0;
+      }
+      
+      .sidebar a i {
+        margin-right: 0;
+      }
+      
+      .main {
+        margin-left: 70px;
+      }
+      
+      table {
+        display: block;
+        overflow-x: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Manage Patients</h1>
-  <a href="admindashboard.html" class="action-btn view-btn" style="margin-bottom: 20px;">⬅ Back</a>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="patientTable">
-      <!-- Patients will load here -->
-    </tbody>
-  </table>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-lock"></i> <span>MediVault</span></h2>
+    </div>
+    <a href="admindashboard.html">
+      <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+    </a>
+    <a href="manage-doctors.html">
+      <i class="fas fa-user-md"></i> <span>Manage Doctors</span>
+    </a>
+    <a href="manage-patients.html" class="active">
+      <i class="fas fa-procedures"></i> <span>Manage Patients</span>
+    </a>
+    <a href="manage-hospitals.html">
+      <i class="fas fa-hospital"></i> <span>Manage Hospitals</span>
+    </a>
+    <a href="manage-reports.html">
+      <i class="fas fa-file-medical"></i> <span>Manage Reports</span>
+    </a>
+    <a href="manage-requests.html">
+      <i class="fas fa-envelope"></i> <span>Manage Requests</span>
+    </a>
+    <a href="home.html">
+      <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+    </a>
+  </div>
+  
+  <div class="main">
+    <a href="admindashboard.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <h1>Manage Patients</h1>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="patientTable">
+        <tr>
+          <td colspan="4" style="text-align: center;">
+            <div class="loading"></div> Loading patients...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <script>
+    // Function to fetch and display patients
     async function loadPatients() {
-      const res = await fetch('/api/admin/patients');
-      const patients = await res.json();
-      const table = document.getElementById('patientTable');
-      table.innerHTML = '';
-      patients.forEach(patient => {
-        const row = `<tr>
-          <td>${patient._id}</td>
-          <td>${patient.name}</td>
-          <td>${patient.email}</td>
-          <td>
-            <button onclick="deletePatient('${patient._id}')" class="action-btn delete-btn">Delete</button>
-          </td>
-        </tr>`;
-        table.innerHTML += row;
-      });
-    }
-
-    async function deletePatient(id) {
-      if (confirm('Are you sure you want to delete this patient?')) {
-        await fetch(`/api/admin/patients/${id}`, { method: 'DELETE' });
-        loadPatients();
+      try {
+        // Replace with your actual API endpoint
+        const res = await fetch('/api/admin/patients');
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        
+        const patients = await res.json();
+        const table = document.getElementById('patientTable');
+        table.innerHTML = '';
+        
+        if (patients.length === 0) {
+          table.innerHTML = '<tr><td colspan="4" style="text-align: center;">No patients found</td></tr>';
+          return;
+        }
+        
+        patients.forEach(patient => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${patient._id}</td>
+            <td>${patient.name}</td>
+            <td>${patient.email}</td>
+            <td>
+              <button onclick="deletePatient('${patient._id}')" class="action-btn delete-btn">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+        
+      } catch (error) {
+        console.error('Error loading patients:', error);
+        document.getElementById('patientTable').innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--danger);">
+              Failed to load patients. Please try again later.
+            </td>
+          </tr>
+        `;
       }
     }
-    loadPatients();
+    
+    // Function to delete a patient
+    async function deletePatient(id) {
+      if (confirm('Are you sure you want to delete this patient?')) {
+        try {
+          // Show loading state on button
+          const btn = event.target;
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<div class="loading"></div> Deleting...';
+          btn.disabled = true;
+          
+          // Replace with your actual API endpoint
+          const res = await fetch(`/api/admin/patients/${id}`, {
+            method: 'DELETE'
+          });
+          
+          if (!res.ok) {
+            throw new Error('Failed to delete patient');
+          }
+          
+          // Reload the patients list
+          loadPatients();
+          
+        } catch (error) {
+          console.error('Error deleting patient:', error);
+          alert('Failed to delete patient. Please try again.');
+          event.target.innerHTML = originalText;
+          event.target.disabled = false;
+        }
+      }
+    }
+    
+    // Load patients when page loads
+    document.addEventListener('DOMContentLoaded', loadPatients);
   </script>
 </body>
 </html>

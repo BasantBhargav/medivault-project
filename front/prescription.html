@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Write Prescription | MediVault</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a6cf7;
+      --primary-light: #6a85f9;
+      --success: #28a745;
+      --danger: #dc3545;
+      --bg: #f8fafd;
+      --card-bg: #fff;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); }
+    .container { max-width: 800px; margin: 30px auto; background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    h1 { color: var(--primary); margin-bottom: 15px; text-align: center; }
+    .btn { padding: 10px 20px; background: linear-gradient(to right, var(--primary), var(--primary-light)); color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-back { background: var(--text-medium); margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+    .form-control { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .alert { padding: 12px; border-radius: 5px; margin-bottom: 15px; }
+    .alert-success { background: rgba(40, 167, 69, 0.1); border-left: 4px solid var(--success); color: var(--success); }
+    .alert-danger { background: rgba(220, 53, 69, 0.1); border-left: 4px solid var(--danger); color: var(--danger); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="btn btn-back" onclick="window.location.href='doctordashboard.html'">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+
+    <h1>Write Prescription</h1>
+
+    <div id="alertPlaceholder"></div>
+
+    <!-- Patient Search -->
+    <div id="patientSearchSection">
+      <form id="patientSearchForm">
+        <div class="form-group">
+          <label for="searchPatientId">Enter Patient ID</label>
+          <input type="text" id="searchPatientId" class="form-control" placeholder="e.g. P1001" required />
+        </div>
+        <button type="submit" class="btn">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </form>
+    </div>
+
+    <!-- Patient Info & Prescription Form -->
+    <div id="patientInfoSection" class="hidden">
+      <div class="form-group">
+        <h3>Patient Details</h3>
+        <p><strong>Name:</strong> <span id="patientName">-</span></p>
+        <p><strong>ID:</strong> <span id="patientIdDisplay">-</span></p>
+        <p><strong>Email:</strong> <span id="patientEmail">-</span></p>
+        <p><strong>Phone:</strong> <span id="patientPhone">-</span></p>
+      </div>
+
+      <form id="prescriptionForm">
+        <input type="hidden" id="prescriptionPatientId">
+
+        <div class="form-group">
+          <label for="diagnosis">Diagnosis</label>
+          <input type="text" id="diagnosis" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label>Medications</label>
+          <div id="medicationsContainer"></div>
+          <button type="button" id="addMedication" class="btn">
+            <i class="fas fa-plus"></i> Add Medication
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Additional Notes</label>
+          <textarea id="notes" class="form-control" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="followUpDate">Follow-up Date</label>
+          <input type="date" id="followUpDate" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn">
+          <i class="fas fa-save"></i> Save Prescription
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const patientSearchForm = document.getElementById('patientSearchForm');
+    const patientSearchSection = document.getElementById('patientSearchSection');
+    const patientInfoSection = document.getElementById('patientInfoSection');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+    const medicationsContainer = document.getElementById('medicationsContainer');
+    const prescriptionForm = document.getElementById('prescriptionForm');
+
+    function showAlert(message, type = 'success') {
+      alertPlaceholder.innerHTML = `
+        <div class="alert alert-${type}">${message}</div>
+      `;
+      setTimeout(() => alertPlaceholder.innerHTML = '', 4000);
+    }
+
+    // Patient search
+    patientSearchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const patientId = document.getElementById('searchPatientId').value.trim();
+
+      try {
+        const res = await fetch(`/api/prescriptions/patients/${patientId}`);
+        if (res.ok) {
+          const patient = await res.json();
+          document.getElementById('patientName').textContent = patient.name;
+          document.getElementById('patientIdDisplay').textContent = patient._id;
+          document.getElementById('patientEmail').textContent = patient.email;
+          document.getElementById('patientPhone').textContent = patient.phone;
+          document.getElementById('prescriptionPatientId').value = patient._id;
+          patientSearchSection.classList.add('hidden');
+          patientInfoSection.classList.remove('hidden');
+        } else if (res.status === 404) {
+          showAlert('Patient not found', 'danger');
+        } else {
+          showAlert('Error fetching patient data', 'danger');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Network error. Try again.', 'danger');
+      }
+    });
+
+    // Add medication
+    document.getElementById('addMedication').addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.classList.add('form-group');
+      row.innerHTML = `
+        <input type="text" class="form-control" placeholder="Medicine Name" required />
+      `;
+      medicationsContainer.appendChild(row);
+    });
+
+    // Save prescription
+    prescriptionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const prescriptionData = {
+        patientId: document.getElementById('prescriptionPatientId').value,
+        diagnosis: document.getElementById('diagnosis').value.trim(),
+        medications: Array.from(medicationsContainer.querySelectorAll('input')).map(input => ({
+          name: input.value.trim(),
+        })),
+        notes: document.getElementById('notes').value.trim(),
+        followUpDate: document.getElementById('followUpDate').value
+      };
+
+      try {
+        const res = await fetch('/api/prescriptions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(prescriptionData)
+        });
+
+        if (res.ok) {
+          showAlert('Prescription saved successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = 'doctordashboard.html';
+          }, 2000);
+        } else {
+          const data = await res.json();
+          showAlert(data.message || 'Failed to save prescription.', 'danger');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Network error. Try again.', 'danger');
+      }
+    });
+  </script>
+</body>
+</html>

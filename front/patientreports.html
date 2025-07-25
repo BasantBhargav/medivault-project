@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Patient Reports | MediVault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --primary: #4a6cf7;
@@ -61,15 +62,28 @@
       border-radius: 12px;
       margin-bottom: 30px;
       box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
     }
 
     .patient-info h2 {
+      grid-column: 1 / -1;
       margin: 0 0 10px;
       font-size: 1.3rem;
     }
 
-    .patient-info p {
+    .patient-info-item {
       margin: 4px 0;
+    }
+
+    .patient-info-item strong {
+      display: block;
+      color: var(--text-dark);
+      margin-bottom: 3px;
+    }
+
+    .patient-info-item span {
       color: var(--text-medium);
       font-size: 0.95rem;
     }
@@ -155,14 +169,29 @@
       color: #999;
       font-size: 1rem;
     }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .patient-info {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <a href="/doctordashboard" class="back-link">&larr; Back to Dashboard</a>
     <h1>Patient Report Details</h1>
-
-    <div class="patient-info" id="patientDetails"></div>
+    
+    <div class="patient-info" id="patientDetails">
+      <div class="loading">Loading patient information...</div>
+    </div>
 
     <div class="controls">
       <select id="sortSelect" onchange="renderReports()">
@@ -173,12 +202,58 @@
       </select>
     </div>
 
-    <div id="reportContainer">Loading reports...</div>
+    <div id="reportContainer">
+      <div class="loading">Loading reports...</div>
+    </div>
   </div>
 
   <script>
     const patientId = new URLSearchParams(window.location.search).get('patientId');
     let reportData = [];
+    let patientData = {};
+
+    async function fetchPatientDetails() {
+      try {
+        const res = await fetch(`/api/patient/details?patientId=${patientId}`);
+        if (!res.ok) {
+          throw new Error('Patient not found');
+        }
+        patientData = await res.json();
+        renderPatientDetails();
+      } catch (err) {
+        console.error('Error loading patient details:', err);
+        document.getElementById('patientDetails').innerHTML = `
+          <div class="no-data">Error loading patient details: ${err.message}</div>
+        `;
+      }
+    }
+
+    function renderPatientDetails() {
+      const details = `
+        <h2>Patient Information</h2>
+        <div class="patient-info-item">
+          <strong>Patient ID</strong>
+          <span>${patientId}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Name</strong>
+          <span>${patientData.name || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Email</strong>
+          <span>${patientData.email || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Phone</strong>
+          <span>${patientData.phone || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Status</strong>
+          <span>${patientData.verified ? 'Verified' : 'Not Verified'}</span>
+        </div>
+      `;
+      document.getElementById('patientDetails').innerHTML = details;
+    }
 
     async function fetchReports() {
       try {
@@ -187,23 +262,18 @@
         reportData = data;
 
         if (!data.length) {
-          document.getElementById('reportContainer').innerHTML =
-            '<div class="no-data">No reports found for patient ID: <strong>' + patientId + '</strong></div>';
+          document.getElementById('reportContainer').innerHTML = `
+            <div class="no-data">No reports found for patient ID: <strong>${patientId}</strong></div>
+          `;
           return;
         }
-
-        const details = `
-          <h2>Patient ID: ${patientId}</h2>
-          <p><strong>Total Reports:</strong> ${data.length}</p>
-          <p><strong>Last Report Uploaded:</strong> ${new Date(data[0].uploadedAt).toLocaleString()}</p>
-        `;
-        document.getElementById('patientDetails').innerHTML = details;
 
         renderReports();
       } catch (err) {
         console.error('Error loading reports:', err);
-        document.getElementById('reportContainer').innerHTML =
-          '<div class="no-data">An error occurred while fetching reports.</div>';
+        document.getElementById('reportContainer').innerHTML = `
+          <div class="no-data">An error occurred while fetching reports.</div>
+        `;
       }
     }
 
@@ -235,7 +305,860 @@
       `).join('');
     }
 
+    // Load both patient details and reports
+    fetchPatientDetails();
+    fetchReports();
+  </script>
+</body>
+</html> -->
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Patient Reports | MediVault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #4a6cf7;
+      --accent: #36d1dc;
+      --bg: #f8fafd;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+      --card-bg: #fff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Enhanced Back Button */
+    .header-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(74, 108, 247, 0.4);
+      background: linear-gradient(135deg, #3d56df 0%, #2bb3c7 100%);
+    }
+
+    .back-btn:active {
+      transform: translateY(0);
+    }
+
+    .back-btn i {
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .back-btn:hover i {
+      transform: translateX(-2px);
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .patient-info {
+      background: var(--card-bg);
+      padding: 24px;
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .patient-info h2 {
+      grid-column: 1 / -1;
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+    }
+
+    .patient-info-item {
+      margin: 4px 0;
+    }
+
+    .patient-info-item strong {
+      display: block;
+      color: var(--text-dark);
+      margin-bottom: 3px;
+    }
+
+    .patient-info-item span {
+      color: var(--text-medium);
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .report-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .report-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .report-card h3 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .report-card p {
+      margin: 6px 0;
+      color: var(--text-medium);
+    }
+
+    .report-actions {
+      margin-top: 14px;
+    }
+
+    .report-actions button,
+    .report-actions a {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-right: 12px;
+      transition: background 0.3s ease, transform 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .view-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .view-btn:hover {
+      background: #3d56df;
+      transform: translateY(-1px);
+    }
+
+    .download-btn {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .download-btn:hover {
+      background: #0e9f6e;
+      transform: translateY(-1px);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    /* Modal Styles - Same as Previous Dashboard */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    .modal-content {
+      position: absolute;
+      background: #ffffff;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 900px;
+      height: 90vh;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease;
+      border: 2px solid #e0e0e0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Window State Classes */
+    .modal-content.minimized {
+      width: 360px !important;
+      height: 50px !important;
+      border-radius: 8px;
+      overflow: hidden;
+      top: auto !important;
+      bottom: 20px !important;
+      left: 20px !important;
+      right: auto !important;
+      transform: none !important;
+      cursor: pointer;
+      animation: minimizeIn 0.3s ease;
+      margin: 0 !important;
+      max-width: none !important;
+    }
+
+    .modal-content.maximized {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      transform: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      animation: maximizeIn 0.3s ease;
+      z-index: 2001;
+    }
+
+    /* Document Header */
+    .modal-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 3px solid var(--primary);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      cursor: default;
+    }
+
+    .modal-header::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #ddd, transparent);
+    }
+
+    .document-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--text-dark);
+    }
+
+    .document-title .icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .document-title .text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .document-title .main-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .document-title .sub-title {
+      font-size: 0.85rem;
+      color: var(--text-medium);
+      font-weight: 500;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ddd;
+      color: var(--text-dark);
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: #f1f1f1;
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .control-btn.minimize:hover {
+      background: #ffc107;
+      border-color: #ffc107;
+      color: white;
+    }
+
+    .control-btn.maximize:hover {
+      background: #28a745;
+      border-color: #28a745;
+      color: white;
+    }
+
+    .control-btn.close {
+      background: #dc3545;
+      color: white;
+      border-color: #dc3545;
+    }
+
+    .control-btn.close:hover {
+      background: #c82333;
+      border-color: #c82333;
+      color: white;
+    }
+
+    /* Document Body */
+    .modal-body {
+      padding: 0;
+      height: calc(100% - 80px);
+      background: #fafafa;
+      position: relative;
+      border: 1px solid #e9ecef;
+      border-top: none;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+
+    /* Loading State */
+    .modal-loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      z-index: 10;
+      background: rgba(255,255,255,0.95);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .document-spinner {
+      width: 35px;
+      height: 35px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: documentSpin 1s linear infinite;
+    }
+
+    .loading-text {
+      color: var(--text-medium);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modalSlideIn {
+      from { 
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+      }
+      to { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes minimizeIn {
+      from { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      to { 
+        transform: none scale(0.8);
+        opacity: 1;
+      }
+    }
+
+    @keyframes maximizeIn {
+      from { 
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to { 
+        transform: none scale(1);
+      }
+    }
+
+    @keyframes documentSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .back-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .patient-info {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content { 
+        width: 95%; 
+        height: 95vh; 
+      }
+      
+      .modal-header {
+        padding: 0.8rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      
+      .document-title .main-title {
+        font-size: 1rem;
+      }
+      
+      .control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+      }
+
+      .modal-content.minimized {
+        width: calc(100% - 20px) !important;
+        left: 10px !important;
+        right: 10px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .modal-content:not(.minimized) {
+        width: 100% !important;
+        height: 100vh !important;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Enhanced Header Section -->
+    <div class="header-section">
+      <a href="/doctordashboard" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </a>
+      <h1>Patient Report Details</h1>
+    </div>
+    
+    <div class="patient-info" id="patientDetails">
+      <div class="loading">Loading patient information...</div>
+    </div>
+
+    <div class="controls">
+      <select id="sortSelect" onchange="renderReports()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="az">Report Type A-Z</option>
+        <option value="za">Report Type Z-A</option>
+      </select>
+    </div>
+
+    <div id="reportContainer">
+      <div class="loading">Loading reports...</div>
+    </div>
+  </div>
+
+  <!-- Document Modal -->
+  <div id="reportModal" class="modal">
+    <div class="modal-content" id="modalBox">
+      <div class="modal-header">
+        <div class="document-title">
+          <div class="icon">
+            <i class="fas fa-file-medical"></i>
+          </div>
+          <div class="text">
+            <div class="main-title" id="modalTitle">Medical Report</div>
+            <div class="sub-title">Patient Document Viewer</div>
+          </div>
+        </div>
+        
+        <div class="window-controls">
+          <button class="control-btn minimize" id="minBtn" title="Minimize">
+            <i class="fas fa-window-minimize"></i>
+          </button>
+          <button class="control-btn maximize" id="maxBtn" title="Maximize">
+            <i class="fas fa-window-maximize"></i>
+          </button>
+          <button class="control-btn close" onclick="closeModal()" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-loading" id="modalLoading">
+          <div class="document-spinner"></div>
+          <div class="loading-text">Loading document...</div>
+        </div>
+        <iframe id="reportFrame" src="" onload="hideLoading()"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const patientId = new URLSearchParams(window.location.search).get('patientId');
+    let reportData = [];
+    let patientData = {};
+
+    // Modal window controls
+    const modal = document.getElementById('reportModal');
+    const modalBox = document.getElementById('modalBox');
+    const minBtn = document.getElementById('minBtn');
+    const maxBtn = document.getElementById('maxBtn');
+    let isMin = false;
+    let isMax = false;
+
+    async function fetchPatientDetails() {
+      try {
+        const res = await fetch(`/api/patient/details?patientId=${patientId}`);
+        if (!res.ok) {
+          throw new Error('Patient not found');
+        }
+        patientData = await res.json();
+        renderPatientDetails();
+      } catch (err) {
+        console.error('Error loading patient details:', err);
+        document.getElementById('patientDetails').innerHTML = `
+          <div class="no-data">Error loading patient details: ${err.message}</div>
+        `;
+      }
+    }
+
+    function renderPatientDetails() {
+      const details = `
+        <h2>Patient Information</h2>
+        <div class="patient-info-item">
+          <strong>Patient ID</strong>
+          <span>${patientId}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Name</strong>
+          <span>${patientData.name || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Email</strong>
+          <span>${patientData.email || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Phone</strong>
+          <span>${patientData.phone || 'Not available'}</span>
+        </div>
+        <div class="patient-info-item">
+          <strong>Status</strong>
+          <span>${patientData.verified ? 'Verified' : 'Not Verified'}</span>
+        </div>
+      `;
+      document.getElementById('patientDetails').innerHTML = details;
+    }
+
+    async function fetchReports() {
+      try {
+        const res = await fetch(`/api/reports/${patientId}`);
+        const data = await res.json();
+        reportData = data;
+
+        if (!data.length) {
+          document.getElementById('reportContainer').innerHTML = `
+            <div class="no-data">No reports found for patient ID: <strong>${patientId}</strong></div>
+          `;
+          return;
+        }
+
+        renderReports();
+      } catch (err) {
+        console.error('Error loading reports:', err);
+        document.getElementById('reportContainer').innerHTML = `
+          <div class="no-data">An error occurred while fetching reports.</div>
+        `;
+      }
+    }
+
+    function renderReports() {
+      const container = document.getElementById('reportContainer');
+      const sortValue = document.getElementById('sortSelect').value;
+
+      let sorted = [...reportData];
+      if (sortValue === 'newest') {
+        sorted.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+      } else if (sortValue === 'oldest') {
+        sorted.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt));
+      } else if (sortValue === 'az') {
+        sorted.sort((a, b) => a.reportType.localeCompare(b.reportType));
+      } else if (sortValue === 'za') {
+        sorted.sort((a, b) => b.reportType.localeCompare(a.reportType));
+      }
+
+      container.innerHTML = sorted.map(r => `
+        <div class="report-card">
+          <h3>${r.reportType}</h3>
+          <p><strong>File:</strong> ${r.filename}</p>
+          <p><strong>Uploaded:</strong> ${new Date(r.uploadedAt).toLocaleString()}</p>
+          <div class="report-actions">
+            <button class="view-btn" onclick="openReportModal('${r.filePath}', '${r.reportType}')">
+              🔍 View
+            </button>
+            <a href="/${r.filePath}" class="download-btn" download>⬇ Download</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Modal Functions
+    function openReportModal(filePath, reportType) {
+      const iframe = document.getElementById('reportFrame');
+      const title = document.getElementById('modalTitle');
+      const loading = document.getElementById('modalLoading');
+      
+      title.textContent = reportType;
+      loading.style.display = 'flex';
+      iframe.style.display = 'none';
+      iframe.src = '/' + filePath;
+      modal.style.display = 'block';
+      
+      // Reset window state
+      modalBox.classList.remove('minimized', 'maximized');
+      isMin = false;
+      isMax = false;
+      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+      minBtn.title = 'Minimize';
+      maxBtn.title = 'Maximize';
+      
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideLoading() {
+      const loading = document.getElementById('modalLoading');
+      const iframe = document.getElementById('reportFrame');
+      setTimeout(() => {
+        loading.style.display = 'none';
+        iframe.style.display = 'block';
+      }, 500);
+    }
+
+    function closeModal() {
+      const iframe = document.getElementById('reportFrame');
+      
+      modal.style.display = 'none';
+      iframe.src = '';
+      
+      // Reset window state
+      modalBox.classList.remove('minimized', 'maximized');
+      isMin = false;
+      isMax = false;
+      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+      
+      document.body.style.overflow = 'auto';
+    }
+
+    // Window Controls
+    minBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!isMin) {
+        modalBox.classList.add('minimized');
+        modalBox.classList.remove('maximized');
+        isMin = true;
+        isMax = false;
+        minBtn.innerHTML = '<i class="fas fa-window-restore"></i>';
+        minBtn.title = 'Restore';
+        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+        maxBtn.title = 'Maximize';
+      } else {
+        modalBox.classList.remove('minimized');
+        isMin = false;
+        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+        minBtn.title = 'Minimize';
+      }
+    });
+
+    maxBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!isMax) {
+        modalBox.classList.add('maximized');
+        modalBox.classList.remove('minimized');
+        isMax = true;
+        isMin = false;
+        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        maxBtn.title = 'Restore';
+        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+        minBtn.title = 'Minimize';
+      } else {
+        modalBox.classList.remove('maximized');
+        isMax = false;
+        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+        maxBtn.title = 'Maximize';
+      }
+    });
+
+    // Double click on header to toggle maximize
+    document.querySelector('.modal-header').addEventListener('dblclick', function() {
+      if (!isMax) {
+        modalBox.classList.add('maximized');
+        modalBox.classList.remove('minimized');
+        isMax = true;
+        isMin = false;
+        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        maxBtn.title = 'Restore';
+      } else {
+        modalBox.classList.remove('maximized');
+        isMax = false;
+        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+        maxBtn.title = 'Maximize';
+      }
+    });
+
+    // Restore from minimized state when clicking on the bar
+    modalBox.addEventListener('click', function() {
+      if (isMin) {
+        modalBox.classList.remove('minimized');
+        isMin = false;
+        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+        minBtn.title = 'Minimize';
+      }
+    });
+
+    // Event Listeners
+    window.onclick = function(event) {
+      if (event.target === modal && !isMin) {
+        closeModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Load both patient details and reports
+    fetchPatientDetails();
     fetchReports();
   </script>
 </body>
 </html>
+
