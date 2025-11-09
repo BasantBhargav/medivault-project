@@ -56,6 +56,11 @@
       padding: 8px 12px;
       border-radius: 4px;
     }
+    nav a.active {
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 6px;
+}
+
     nav a:hover {
       background-color: rgba(255,255,255,0.2);
     }
@@ -553,6 +558,31 @@ topBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 </script>
+
+<script>
+const links = document.querySelectorAll("nav a");
+
+window.addEventListener("hashchange", highlightLink);
+window.addEventListener("load", highlightLink);
+
+function highlightLink() {
+  let current = window.location.hash;  // #features, #testimonials, etc.
+  
+  links.forEach(link => {
+    link.classList.remove("active");
+    
+    if (current && link.getAttribute("href") === current) {
+      link.classList.add("active");
+    }
+
+    // Make Home active only when no hash
+    if (!current && link.getAttribute("href") === "/") {
+      link.classList.add("active");
+    }
+  });
+}
+</script>
+
 
 </body>
 </html>
