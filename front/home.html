@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    html {
+  scroll-behavior: smooth;
+}
     :root {
       --primary: #5b6dfa;
       --accent: #36d1dc;
@@ -331,6 +334,23 @@
         padding: 60px 20px;
       }
     }
+
+    #backToTop {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  z-index: 999;
+}
+
   </style>
 </head>
 <body>
@@ -520,5 +540,19 @@
       &copy; 2025 MediVault Technologies. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
     </div>
   </footer>
+  <button id="backToTop">↑</button>
+  <script>
+const topBtn = document.getElementById("backToTop");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 300) topBtn.style.display = "block";
+  else topBtn.style.display = "none";
+});
+
+topBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+
 </body>
 </html>
