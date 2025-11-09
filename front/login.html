@@ -73,11 +73,21 @@
       position: relative;
     }
 
+  nav a.active {
+  background-color: rgba(255,255,255,0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+
+    
+
     header nav a:hover {
       color: #e0e0e0;
     }
 
-    header nav a::after {
+    /* header nav a::after {
       content: '';
       position: absolute;
       width: 0;
@@ -90,7 +100,7 @@
 
     header nav a:hover::after {
       width: 100%;
-    }
+    } */
 
     .login-container {
       flex: 1;
@@ -344,6 +354,59 @@
       </div>
     </div>
   </div>
+
+<script>
+(function () {
+  const links = document.querySelectorAll("nav a");
+
+  // Normalize a path: remove trailing slash and .html
+  function normPath(path) {
+    if (!path) return "/";
+    // keep only pathname (in case we pass a full URL)
+    try { path = new URL(path, window.location.origin).pathname; } catch (_) {}
+    // strip .html
+    path = path.replace(/\/index\.html$/i, "/").replace(/\.html$/i, "");
+    // strip trailing slashes (but keep root "/")
+    if (path.length > 1) path = path.replace(/\/+$/,"");
+    return path || "/";
+  }
+
+  // Current location broken into parts
+  const currentHash  = window.location.hash;              // e.g. "#features"
+  const currentPath  = normPath(window.location.pathname); // e.g. "/login" or "/signup"
+
+  // Clear previous
+  links.forEach(a => a.classList.remove("active"));
+
+  links.forEach(a => {
+    const href = a.getAttribute("href") || "";
+    if (href.startsWith("#")) {
+      // Home page section links
+      if (currentHash && href === currentHash) a.classList.add("active");
+      // Make Home active when there is no hash on the home page
+      if (!currentHash && normPath("/") === currentPath && href === "/") a.classList.add("active");
+    } else {
+      // Normal page links like /login, /signup, /
+      if (normPath(href) === currentPath) a.classList.add("active");
+      // Also consider direct file loads like /login.html vs /login
+      if (href.endsWith(".html") && normPath(href) === currentPath) a.classList.add("active");
+    }
+  });
+
+  // Update highlight when hash changes on the home page
+  window.addEventListener("hashchange", () => {
+    links.forEach(a => a.classList.remove("active"));
+    const newHash = window.location.hash;
+    links.forEach(a => {
+      const href = a.getAttribute("href") || "";
+      if (href.startsWith("#") && href === newHash) a.classList.add("active");
+      if (!newHash && normPath("/") === normPath(window.location.pathname) && href === "/") a.classList.add("active");
+    });
+  });
+})();
+</script>
+
+
 
 </body>
 </html>
