@@ -773,10 +773,24 @@ nextBtn.addEventListener('click', () => {
         return;
     }
 
+    // ✅ Email basic pattern check
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    alert("Please enter a valid email address.");
+    return;
+}
+
+
     if (password !== confirmPassword) {
         alert('Passwords do not match');
         return;
     }
+
+    // Strong password: min 8 chars, one uppercase, one digit
+if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
+    alert("Password must be at least 8 characters, include 1 uppercase letter and 1 number.");
+    return;
+}
+
 
     // ✅ THE REAL FIX – PHONE NUMBER VALIDATION
     if (!/^\d{10}$/.test(phone.trim())) {
@@ -830,38 +844,213 @@ nextBtn.addEventListener('click', () => {
       });
       
       // Form submission
-      signupForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+//       signupForm.addEventListener('submit', async (e) => {
+//         e.preventDefault();
         
 
-        const formData = new FormData(signupForm);
-        const data = Object.fromEntries(formData.entries());
+//         const formData = new FormData(signupForm);
+//         const data = Object.fromEntries(formData.entries());
 
-        try {
-          const response = await fetch('/signup', {
+//         // ✅ Hospital-specific validation
+// if (selectedRole === 'hospital_staff') {
+//     const pin = document.getElementById('pin_code').value.trim();
+
+//     if (!/^\d{6}$/.test(pin)) {
+//         alert("PIN code must be exactly 6 digits (Indian PIN code format).");
+//         return;
+//     }
+// }
+
+
+//         try {
+//           const response = await fetch('/signup', {
+//             method: 'POST',
+//             headers: {
+//               'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify(data)
+//           });
+
+//           if (response.ok) {
+//             if (selectedRole === 'patient') {
+//               window.location.href = '/patientdashboard';
+//             } else {
+//               alert('Your signup request has been sent for admin approval. You will be notified once approved.');
+//               window.location.href = '/login';
+//             }
+//           } else {
+//             const error = await response.text();
+//             alert(error);
+//           }
+//         } catch (err) {
+//           console.error('Error submitting form:', err);
+//           alert('An error occurred. Please try again.');
+//         }
+//       });
+
+      signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(signupForm);
+    const data = Object.fromEntries(formData.entries());
+
+    // ✅ COMMON VALIDATIONS (for ALL roles)
+    const name = data.name?.trim();
+    const email = data.email?.trim();
+    const phone = data.phone?.trim();
+    const password = data.password;
+    const confirmPassword = data.confirm_password;
+
+    // ✅ Name required & should be at least 2 characters
+    if (!name || name.length < 2) {
+        alert("Full name must be at least 2 characters.");
+        return;
+    }
+
+    // ✅ Email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    // ✅ Phone validation (10 digits)
+    if (!/^\d{10}$/.test(phone)) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
+    }
+
+    // ✅ Password match
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    // ✅ Password strength
+    // At least 8 chars, 1 uppercase, 1 number
+    if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
+        alert("Password must be at least 8 characters and include 1 uppercase letter and 1 number.");
+        return;
+    }
+
+    // ✅ ROLE-SPECIFIC VALIDATIONS
+    //-------------------------------------------------
+
+    // ✅ PATIENT VALIDATION
+    if (selectedRole === "patient") {
+
+        const age = Number(data.age);
+        const gender = data.gender;
+        const address = data.address?.trim();
+
+        // Age must be between 1–120
+        if (isNaN(age) || age < 1 || age > 120) {
+            alert("Age must be between 1 and 120.");
+            return;
+        }
+
+        if (!gender) {
+            alert("Please select your gender.");
+            return;
+        }
+
+        if (!address || address.length < 5) {
+            alert("Please enter a valid address (minimum 5 characters).");
+            return;
+        }
+    }
+
+    // ✅ DOCTOR VALIDATION
+    if (selectedRole === "doctor") {
+
+        const license = data.license_number?.trim();
+        const specialization = data.specialization?.trim();
+        const hospitalId = data.hospital_id?.trim();
+        const experience = Number(data.experience_years);
+
+        // License number format (at least 5 alphanumeric)
+        if (!/^[A-Za-z0-9]{5,}$/.test(license)) {
+            alert("License number must be at least 5 letters/numbers.");
+            return;
+        }
+
+        if (!specialization || specialization.length < 3) {
+            alert("Specialization must be at least 3 characters.");
+            return;
+        }
+
+        if (!hospitalId) {
+            alert("Hospital ID is required.");
+            return;
+        }
+
+        // Experience must be 0–60
+        if (isNaN(experience) || experience < 0 || experience > 60) {
+            alert("Experience must be between 0 and 60 years.");
+            return;
+        }
+    }
+
+    // ✅ HOSPITAL VALIDATION
+    if (selectedRole === "hospital_staff") {
+
+        const hname = data.hospital_name?.trim();
+        const addr = data.address_line?.trim();
+        const city = data.city?.trim();
+        const state = data.state?.trim();
+        const pin = data.pin_code?.trim();
+
+        if (!hname || hname.length < 3) {
+            alert("Hospital name must be at least 3 characters.");
+            return;
+        }
+
+        if (!addr || addr.length < 5) {
+            alert("Address line must be at least 5 characters.");
+            return;
+        }
+
+        if (!city || city.length < 2) {
+            alert("City name must be at least 2 characters.");
+            return;
+        }
+
+        if (!state || state.length < 2) {
+            alert("State name must be at least 2 characters.");
+            return;
+        }
+
+        // ✅ PIN code must be 6 digits
+        if (!/^\d{6}$/.test(pin)) {
+            alert("PIN code must be exactly 6 digits.");
+            return;
+        }
+    }
+
+    // ✅ If everything is valid → Submit data to backend
+    try {
+        const response = await fetch('/signup', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
-          });
+        });
 
-          if (response.ok) {
+        if (response.ok) {
             if (selectedRole === 'patient') {
-              window.location.href = '/patientdashboard';
+                window.location.href = '/patientdashboard';
             } else {
-              alert('Your signup request has been sent for admin approval. You will be notified once approved.');
-              window.location.href = '/login';
+                alert('Your signup request has been sent for admin approval.');
+                window.location.href = '/login';
             }
-          } else {
+        } else {
             const error = await response.text();
             alert(error);
-          }
-        } catch (err) {
-          console.error('Error submitting form:', err);
-          alert('An error occurred. Please try again.');
         }
-      });
+    } catch (err) {
+        console.error('Error submitting form:', err);
+        alert('An error occurred. Please try again.');
+    }
+});
+
     });
   </script>
 
