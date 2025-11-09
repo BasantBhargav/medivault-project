@@ -416,9 +416,16 @@
 <body>
   <!-- Updated Header -->
   <header>
+    <!-- <div class="logo">
+      <i class="fas fa-heartbeat"></i> MediVault
+    </div> -->
+
+     <a href="/" style="text-decoration: none; color: inherit;">
     <div class="logo">
       <i class="fas fa-heartbeat"></i> MediVault
     </div>
+  </a>
+
     <nav>
       <a href="/">Home</a>
       <a href="/login">Login</a>
@@ -431,6 +438,8 @@
       <div class="logo">
         <i class="fas fa-lock-medical"></i>
       </div>
+
+
       <h1>Welcome to MediVault</h1>
       <p>Secure your health records and access them anytime, anywhere. Join our trusted healthcare network today.</p>
       <p>Already a member? <a href="/login" style="color: white; text-decoration: underline;">Log in here</a></p>
@@ -656,19 +665,47 @@
       let selectedRole = '';
       
       // Role selection
-      roleCards.forEach(card => {
-        card.addEventListener('click', () => {
-          roleCards.forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-          selectedRole = card.dataset.role;
-          roleInput.value = selectedRole;
-          commonFields.classList.add('active');
-          steps[0].classList.add('completed');
-          steps[1].classList.add('active');
-          progressBar.style.width = '66%';
-        });
-      });
+      // roleCards.forEach(card => {
+      //   card.addEventListener('click', () => {
+      //     roleCards.forEach(c => c.classList.remove('active'));
+      //     card.classList.add('active');
+      //     selectedRole = card.dataset.role;
+      //     roleInput.value = selectedRole;
+      //     commonFields.classList.add('active');
+      //     steps[0].classList.add('completed');
+      //     steps[1].classList.add('active');
+      //     progressBar.style.width = '66%';
+      //   });
+      // });
+
+      function resetAllForms() {
+  document.querySelectorAll("input, textarea, select").forEach(field => {
+    field.value = "";
+  });
+}
+
       
+      roleCards.forEach(card => {
+  card.addEventListener('click', () => {
+
+    roleCards.forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+
+    selectedRole = card.dataset.role;
+    roleInput.value = selectedRole;
+
+    // ✅ Fix UI mess: hide all other role forms when switching
+    patientFields.classList.remove('active');
+    doctorFields.classList.remove('active');
+    hospitalFields.classList.remove('active');
+
+    commonFields.classList.add('active');
+    steps[0].classList.add('completed');
+    steps[1].classList.add('active');
+    progressBar.style.width = '66%';
+  });
+});
+
       // Next button
       // nextBtn.addEventListener('click', () => {
       //   if (!selectedRole) {
