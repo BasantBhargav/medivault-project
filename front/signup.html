@@ -670,43 +670,90 @@
       });
       
       // Next button
-      nextBtn.addEventListener('click', () => {
-        if (!selectedRole) {
-          alert('Please select a role first');
-          return;
-        }
+      // nextBtn.addEventListener('click', () => {
+      //   if (!selectedRole) {
+      //     alert('Please select a role first');
+      //     return;
+      //   }
         
-        // Validate common fields
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
+      //   // Validate common fields
+      //   const name = document.getElementById('name').value;
+      //   const email = document.getElementById('email').value;
+      //   const phone = document.getElementById('phone').value;
+      //   const password = document.getElementById('password').value;
+      //   const confirmPassword = document.getElementById('confirm-password').value;
         
-        if (!name || !email || !phone || !password || !confirmPassword) {
-          alert('Please fill in all required fields');
-          return;
-        }
+      //   if (!name || !email || !phone || !password || !confirmPassword) {
+      //     alert('Please fill in all required fields');
+      //     return;
+      //   }
         
-        if (password !== confirmPassword) {
-          alert('Passwords do not match');
-          return;
-        }
+      //   if (password !== confirmPassword) {
+      //     alert('Passwords do not match');
+      //     return;
+      //   }
         
-        commonFields.classList.remove('active');
+      //   commonFields.classList.remove('active');
         
-        if (selectedRole === 'patient') {
-          patientFields.classList.add('active');
-        } else if (selectedRole === 'doctor') {
-          doctorFields.classList.add('active');
-        } else if (selectedRole === 'hospital_staff') {
-          hospitalFields.classList.add('active');
-        }
+      //   if (selectedRole === 'patient') {
+      //     patientFields.classList.add('active');
+      //   } else if (selectedRole === 'doctor') {
+      //     doctorFields.classList.add('active');
+      //   } else if (selectedRole === 'hospital_staff') {
+      //     hospitalFields.classList.add('active');
+      //   }
         
-        steps[1].classList.add('completed');
-        steps[2].classList.add('active');
-        progressBar.style.width = '100%';
-      });
+      //   steps[1].classList.add('completed');
+      //   steps[2].classList.add('active');
+      //   progressBar.style.width = '100%';
+      // });
+
+      // Next button
+nextBtn.addEventListener('click', () => {
+    if (!selectedRole) {
+        alert('Please select a role first');
+        return;
+    }
+
+    // Validate common fields
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (!name || !email || !phone || !password || !confirmPassword) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+    }
+
+    // ✅ THE REAL FIX – PHONE NUMBER VALIDATION
+    if (!/^\d{10}$/.test(phone.trim())) {
+        alert("Phone number must be exactly 10 digits");
+        return;   // Stop here
+    }
+
+    // If phone is correct → Move to next section
+    commonFields.classList.remove('active');
+
+    if (selectedRole === 'patient') {
+        patientFields.classList.add('active');
+    } else if (selectedRole === 'doctor') {
+        doctorFields.classList.add('active');
+    } else if (selectedRole === 'hospital_staff') {
+        hospitalFields.classList.add('active');
+    }
+
+    steps[1].classList.add('completed');
+    steps[2].classList.add('active');
+    progressBar.style.width = '100%';
+});
+
       
       // Back buttons
       document.getElementById('patient-back-btn').addEventListener('click', () => {
@@ -739,6 +786,7 @@
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
 
         const formData = new FormData(signupForm);
         const data = Object.fromEntries(formData.entries());
@@ -770,5 +818,7 @@
       });
     });
   </script>
+
+  
 </body>
 </html>
