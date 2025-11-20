@@ -15,49 +15,192 @@
       --card-bg: #fff;
       --text-dark: #1f2937;
       --text-medium: #4b5563;
+      --input-border: #cbd5e1;
+      --input-focus-border: var(--primary);
+      --border-radius: 8px;
+      --box-shadow-light: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); }
-    .container { max-width: 800px; margin: 30px auto; background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    h1 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-    .btn { padding: 10px 20px; background: linear-gradient(to right, var(--primary), var(--primary-light)); color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .btn-back { background: var(--text-medium); margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
-    .form-control { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-    .alert { padding: 12px; border-radius: 5px; margin-bottom: 15px; }
-    .alert-success { background: rgba(40, 167, 69, 0.1); border-left: 4px solid var(--success); color: var(--success); }
-    .alert-danger { background: rgba(220, 53, 69, 0.1); border-left: 4px solid var(--danger); color: var(--danger); }
-    .hidden { display: none; }
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow-light);
+      max-width: 850px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Button styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: linear-gradient(to right, var(--primary-light), var(--primary));
+      box-shadow: 0 6px 15px rgba(74, 108, 247, 0.4);
+    }
+
+    /* Back button */
+    .btn-back {
+      background: #718096;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    .btn-back:hover {
+      background: #4a5568;
+    }
+
+    /* Form and section styles */
+    section {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-medium);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1.5px solid var(--input-border);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    textarea:focus {
+      border-color: var(--input-focus-border);
+      box-shadow: 0 0 8px rgba(74, 108, 247, 0.35);
+      outline: none;
+    }
+
+    /* Medication container */
+    #medicationsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    /* Medication row */
+    .medication-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Remove button for medication */
+    .remove-med {
+      background: #dc3545;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .remove-med:hover {
+      background: #b02a37;
+    }
+
+    /* Alert styles */
+    .alert {
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 25px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .alert-success {
+      background: rgba(40, 167, 69, 0.15);
+      border-left: 6px solid var(--success);
+      color: var(--success);
+    }
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.15);
+      border-left: 6px solid var(--danger);
+      color: var(--danger);
+    }
+
+    /* Responsive adjustments */
+    @media(max-width: 600px){
+      body {
+        padding: 20px 10px;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <button class="btn btn-back" onclick="window.location.href='doctordashboard.html'">
-      <i class="fas fa-arrow-left"></i> Back to Dashboard
+  <div class="container" role="main" aria-labelledby="pageTitle">
+    <button class="btn btn-back" onclick="window.location.href='doctordashboard.html'" aria-label="Back to Dashboard">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
     </button>
-
-    <h1>Write Prescription</h1>
-
+    <h1 id="pageTitle">Write Prescription</h1>
     <div id="alertPlaceholder"></div>
 
     <!-- Patient Search -->
-    <div id="patientSearchSection">
+    <section aria-label="Patient Search">
       <form id="patientSearchForm">
-        <div class="form-group">
-          <label for="searchPatientId">Enter Patient ID</label>
-          <input type="text" id="searchPatientId" class="form-control" placeholder="e.g. P1001" required />
-        </div>
-        <button type="submit" class="btn">
-          <i class="fas fa-search"></i> Search
-        </button>
+        <label for="searchPatientId">Enter Patient ID</label>
+        <input type="text" id="searchPatientId" required placeholder="e.g. P1001" aria-required="true" />
+        <button type="submit" class="btn" aria-label="Search Patient"><i class="fas fa-search"></i> Search</button>
       </form>
-    </div>
+    </section>
 
-    <!-- Patient Info & Prescription Form -->
-    <div id="patientInfoSection" class="hidden">
+    <!-- Patient Info & Prescription -->
+    <section id="patientInfoSection" class="hidden" aria-label="Patient Details and Prescription Form">
       <div class="form-group">
         <h3>Patient Details</h3>
         <p><strong>Name:</strong> <span id="patientName">-</span></p>
@@ -65,60 +208,49 @@
         <p><strong>Email:</strong> <span id="patientEmail">-</span></p>
         <p><strong>Phone:</strong> <span id="patientPhone">-</span></p>
       </div>
-
-      <form id="prescriptionForm">
-        <input type="hidden" id="prescriptionPatientId">
+      <form id="prescriptionForm" novalidate>
+        <input type="hidden" id="prescriptionPatientId" />
 
         <div class="form-group">
           <label for="diagnosis">Diagnosis</label>
-          <input type="text" id="diagnosis" class="form-control" required />
+          <input type="text" id="diagnosis" required />
         </div>
 
         <div class="form-group">
           <label>Medications</label>
           <div id="medicationsContainer"></div>
-          <button type="button" id="addMedication" class="btn">
-            <i class="fas fa-plus"></i> Add Medication
-          </button>
+          <button type="button" id="addMedication" class="btn"><i class="fas fa-plus"></i> Add Medication</button>
         </div>
 
         <div class="form-group">
           <label for="notes">Additional Notes</label>
-          <textarea id="notes" class="form-control" rows="4"></textarea>
+          <textarea id="notes" rows="4"></textarea>
         </div>
 
         <div class="form-group">
           <label for="followUpDate">Follow-up Date</label>
-          <input type="date" id="followUpDate" class="form-control" />
+          <input type="date" id="followUpDate" />
         </div>
 
-        <button type="submit" class="btn">
-          <i class="fas fa-save"></i> Save Prescription
-        </button>
+        <button type="submit" class="btn"><i class="fas fa-save"></i> Save Prescription</button>
       </form>
-    </div>
+    </section>
   </div>
 
   <script>
-    const patientSearchForm = document.getElementById('patientSearchForm');
-    const patientSearchSection = document.getElementById('patientSearchSection');
-    const patientInfoSection = document.getElementById('patientInfoSection');
+    const form = document.getElementById('patientSearchForm');
     const alertPlaceholder = document.getElementById('alertPlaceholder');
     const medicationsContainer = document.getElementById('medicationsContainer');
-    const prescriptionForm = document.getElementById('prescriptionForm');
 
-    function showAlert(message, type = 'success') {
-      alertPlaceholder.innerHTML = `
-        <div class="alert alert-${type}">${message}</div>
-      `;
+    function showAlert(message, type='success') {
+      alertPlaceholder.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
       setTimeout(() => alertPlaceholder.innerHTML = '', 4000);
     }
 
-    // Patient search
-    patientSearchForm.addEventListener('submit', async (e) => {
+    // Search patient
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const patientId = document.getElementById('searchPatientId').value.trim();
-
       try {
         const res = await fetch(`/api/prescriptions/patients/${patientId}`);
         if (res.ok) {
@@ -128,62 +260,55 @@
           document.getElementById('patientEmail').textContent = patient.email;
           document.getElementById('patientPhone').textContent = patient.phone;
           document.getElementById('prescriptionPatientId').value = patient._id;
-          patientSearchSection.classList.add('hidden');
-          patientInfoSection.classList.remove('hidden');
-        } else if (res.status === 404) {
-          showAlert('Patient not found', 'danger');
+          document.getElementById('patientInfoSection').classList.remove('hidden');
+          showAlert('Patient loaded successfully!', 'success');
         } else {
-          showAlert('Error fetching patient data', 'danger');
+          showAlert('Patient not found', 'danger');
         }
       } catch (err) {
-        console.error(err);
-        showAlert('Network error. Try again.', 'danger');
+        showAlert('Network error', 'danger');
       }
     });
 
-    // Add medication
+    // Add medication field
     document.getElementById('addMedication').addEventListener('click', () => {
-      const row = document.createElement('div');
-      row.classList.add('form-group');
-      row.innerHTML = `
-        <input type="text" class="form-control" placeholder="Medicine Name" required />
+      const div = document.createElement('div');
+      div.className = 'medication-row';
+      div.innerHTML = `
+        <input type="text" placeholder="Medicine Name" required />
+        <button type="button" class="remove-med"><i class="fas fa-times"></i></button>
       `;
-      medicationsContainer.appendChild(row);
+      // Attach remove event
+      div.querySelector('.remove-med').onclick = () => div.remove();
+      medicationsContainer.appendChild(div);
     });
 
     // Save prescription
-    prescriptionForm.addEventListener('submit', async (e) => {
+    document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const prescriptionData = {
+      const meds = Array.from(medicationsContainer.querySelectorAll('input')).map(i => ({ name: i.value.trim() }));
+      const data = {
         patientId: document.getElementById('prescriptionPatientId').value,
         diagnosis: document.getElementById('diagnosis').value.trim(),
-        medications: Array.from(medicationsContainer.querySelectorAll('input')).map(input => ({
-          name: input.value.trim(),
-        })),
+        medications: meds,
         notes: document.getElementById('notes').value.trim(),
         followUpDate: document.getElementById('followUpDate').value
       };
-
       try {
         const res = await fetch('/api/prescriptions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(prescriptionData)
+          body: JSON.stringify(data)
         });
-
         if (res.ok) {
           showAlert('Prescription saved successfully!', 'success');
-          setTimeout(() => {
-            window.location.href = 'doctordashboard.html';
-          }, 2000);
+          setTimeout(() => window.location.href='doctordashboard.html', 2000);
         } else {
-          const data = await res.json();
-          showAlert(data.message || 'Failed to save prescription.', 'danger');
+          const errMsg = await res.json();
+          showAlert(errMsg.message || 'Error saving!', 'danger');
         }
-      } catch (err) {
-        console.error(err);
-        showAlert('Network error. Try again.', 'danger');
+      } catch {
+        showAlert('Network error!', 'danger');
       }
     });
   </script>
