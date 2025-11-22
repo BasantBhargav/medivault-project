@@ -150,6 +150,7 @@ async function sendReportMail(patient, report) {
     console.error('❌ Error sending mail:', err.message);
   }
 }
+// fixed the send mail logic in mailOptions API of upload.js
 
 /**
  * ✅ Upload report endpoint
