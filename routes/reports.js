@@ -57,7 +57,7 @@ const User = require('../schema/user'); // ✅ For fetching patient info
 
 const router = express.Router();
 
-// ✅ Ensure uploads directory exists
+// Ensure upload directory exists or not
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
