@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// Added the missing field in the appointment schema
 const appointmentSchema = new mongoose.Schema({
   appointment_id: {
     type: String,
