@@ -24,7 +24,7 @@ router.get('/api/patient-dashboard', async (req, res) => {
   }
 });
 
-// DELETE report by ID
+// DELETE the report by ID feature
 router.delete('/delete-report/:id', async (req, res) => {
   try {
     const report = await Report.findById(req.params.id);

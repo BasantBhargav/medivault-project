@@ -809,7 +809,7 @@ router.delete('/patients/:id', async (req, res) => {
   }
 });
 
-//// ✅ CRUD for Hospital Staff ////
+// CRUD  for hospital staff members
 router.get('/hospitals', async (req, res) => {
   try {
     const hospitals = await User.find({ role: 'hospital_staff' });
