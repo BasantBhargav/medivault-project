@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../schema/user'); // Adjust path if needed
 const Report = require('../schema/report'); // Adjust path if needed
 
-// API to fetch hospital details dynamically
+// API's to fetch hospital details dynamically
 router.get('/api/hospital/details', async (req, res) => {
   try {
     const hospitalId = req.session.userId; // assuming hospital user is logged in
