@@ -38,7 +38,7 @@ router.delete('/delete-report/:id', async (req, res) => {
       fs.unlinkSync(filePath);
     }
 
-    // Delete report document from DB
+    // Delete report document from Database
     await Report.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Report deleted successfully' });
   } catch (error) {
