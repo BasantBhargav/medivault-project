@@ -424,7 +424,7 @@ const Report = require('./schema/report');            // Report schema
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Configure session
+// Configure the session
 app.use(session({
   secret: 'yourSecretKey',
   resave: false,
