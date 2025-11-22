@@ -153,7 +153,7 @@ async function sendReportMail(patient, report) {
 // fixed the send mail logic in mailOptions API of upload.js
 
 /**
- * ✅ Upload report endpoint
+ * Upload report endpoint
  */
 router.post('/upload-report', upload.single('report'), async (req, res) => {
   const { patientId, reportType } = req.body;
