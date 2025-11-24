@@ -15,7 +15,7 @@ const uploadRoutes = require('./routes/upload');      // Report upload routes
 const reportsRoutes = require('./routes/reports');    // 🆕 Reports fetch routes
 const hospitalRoutes = require('./routes/hospital');  // Hospital routes
 const User = require('./schema/user');                // User schema
-const Report = require('./schema/report');            // Report schema
+const Report = require('./schema/report');             //Hi there
 
 //  Middleware
 app.use(express.urlencoded({ extended: true }));

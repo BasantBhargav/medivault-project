@@ -32,7 +32,7 @@ router.delete('/delete-report/:id', async (req, res) => {
       return res.status(404).json({ message: 'Report not found' });
     }
 
-    // Delete file from filesystem
+    // Deleted file from filesystem
     const filePath = path.join(__dirname, '../', report.filePath); // assuming filePath is relative like 'public/uploads/xyz.pdf'
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
